@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog Asheeqa Printing</title>
+    <style>
+        :root { --wa: #25D366; --gold: #c5a059; --dark: #2d3436; --bg: #f9f9fb; --promo: #d63031; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; color: #333; }
+        
+        /* Header */
+        .header { background: white; padding: 25px 15px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--gold); margin-bottom: 10px; object-fit: contain; background: white; padding: 8px; box-sizing: border-box; }
+        .brand-name { font-size: 28px; font-weight: 800; color: var(--dark); margin: 0; }
+        
+        /* Admin */
+        .admin-box { background: white; padding: 20px; border-radius: 12px; max-width: 500px; margin: 20px auto; display: none; border: 2px dashed var(--gold); }
+        input, select, textarea, button { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        
+        /* Tabs */
+        .nav-tabs { display: flex; justify-content: center; background: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .tab { padding: 15px 20px; cursor: pointer; font-weight: bold; color: #aaa; border-bottom: 3px solid transparent; }
+        .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+        /* Grid & Card */
+        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; max-width: 1000px; margin: 0 auto; }
+        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); position: relative; display: flex; flex-direction: column; }
+        .card img { width: 100%; height: 180px; object-fit: cover; cursor: pointer; border-bottom: 1px solid #eee; }
+        .badge { position: absolute; top: 10px; left: 10px; background: var(--promo); color: white; padding: 4px 8px; border-radius: 5px; font-size: 10px; font-weight: bold; z-index: 5; pointer-events: none; }
+
+        .info { padding: 12px; text-align: center; }
+        .price-container { display: flex; flex-direction: column; align-items: center; min-height: 40px; justify-content: center; }
+        .price-old { text-decoration: line-through; color: #999; font-size: 11px; }
+        .price-new { color: var(--promo); font-weight: 800; font-size: 15px; }
+
+        /* Modal Detail */
+        #modal-detail { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; overflow-y: auto; }
+        .modal-content { background: white; width: 100%; max-width: 450px; margin: 0 auto; min-height: 100vh; position: relative; }
+        
+        .img-slider-box { width: 100%; height: 380px; overflow: hidden; background: #f0f0f0; display: flex; align-items: center; justify-content: center; position: relative; touch-action: pan-y; }
+        .main-view { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s ease; cursor: zoom-in; }
+
+        .slide-dots { display: flex; justify-content: center; gap: 5px; padding: 10px; background: #fff; }
+        .dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; transition: 0.3s; }
+        .dot.active { background: var(--gold); width: 20px; border-radius: 10px; }
+
+        .thumb-list { display: flex; gap: 8px; padding: 10px; overflow-x: auto; background: #eee; }
+        .thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; cursor: pointer; flex-shrink: 0; border: 2px solid transparent; }
+        .active-thumb { border-color: var(--gold); }
+
+        /* Fullscreen View */
+        #fullscreen-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 2000; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
+        #full-img { max-width: 100%; max-height: 100%; transition: transform 0.3s ease, opacity 0.2s ease; user-select: none; }
+        .close-full { position: absolute; top: 20px; right: 20px; color: white; font-size: 30px; font-weight: bold; cursor: pointer; z-index: 2001; background: rgba(0,0,0,0.5); width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+        .cart-btn { position: fixed; bottom: 20px; right: 20px; background: var(--dark); color: white; padding: 15px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; z-index: 999; border: 2px solid var(--gold); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="https://drive.google.com/thumbnail?id=1F055wulsiC-LDjW_NMZ4yXsMSCDj53TW&sz=w500" class="logo" alt="Logo">
+        <h1 class="brand-name">Asheeqa Printing</h1>
+        <div style="font-size:12px; color:#777;">📍 Jl. Borong Raya 2 - Makassar | 📞 089699910769</div>
+    </div>
+
+    <div class="nav-tabs">
+        <div class="tab active" onclick="filter('PROMO', this)">🔥 PROMO</div>
+        <div class="tab" onclick="filter('AD', this)">AD Series</div>
+        <div class="tab" onclick="filter('CG', this)">CG Series</div>
+    </div>
+
+    <div id="admin-box" class="admin-box">
+        <h3 id="adm-title">Tambah Produk Baru</h3>
+        <input type="hidden" id="edit-id">
+        <input type="hidden" id="o1"><input type="hidden" id="o2"><input type="hidden" id="o3"><input type="hidden" id="o4"><input type="hidden" id="o5">
+        <input type="text" id="nama" placeholder="Nama Produk">
+        <select id="kelompok"><option value="AD">Seri AD</option><option value="CG">Seri CG</option></select>
+        <input type="text" id="jenis" placeholder="Jenis (Softcover/Hardcover)">
+        <input type="number" id="hargaA" placeholder="Harga Asli">
+        <input type="number" id="hargaP" placeholder="Harga Promo">
+        <textarea id="desk" placeholder="Deskripsi..."></textarea>
+        <p style="font-size:11px; color:var(--promo); margin:10px 0 0;">*Upload file (Maks 5)</p>
+        <input type="file" id="f1" accept="image/*"><input type="file" id="f2" accept="image/*"><input type="file" id="f3" accept="image/*">
+        <input type="file" id="f4" accept="image/*"><input type="file" id="f5" accept="image/*">
+        <button onclick="simpan()" id="btnSave" style="background:var(--dark); color:white; font-weight:bold;">SIMPAN</button>
+        <button onclick="hapusProduk()" id="btnDel" style="background:red; color:white; display:none;">HAPUS</button>
+        <button onclick="location.reload()" style="background:#eee;">BATAL</button>
+    </div>
+
+    <div class="container" id="container">Memuat data...</div>
+
+    <div id="modal-detail">
+        <div class="modal-content">
+            <button onclick="tutup()" style="width:100%; padding:15px; border:none; background:#333; color:white; font-weight:bold;">← KEMBALI</button>
+            <div class="img-slider-box" id="slider-area">
+                <img id="v-img" class="main-view">
+            </div>
+            <div class="slide-dots" id="v-dots"></div>
+            <div class="thumb-list" id="v-thumbs"></div>
+            <div style="padding:20px;">
+                <h2 id="v-nama" style="margin:0"></h2>
+                <p id="v-jenis" style="color:var(--gold); font-weight:bold; margin:5px 0;"></p>
+                <div id="v-desk" style="color:#555; font-size:14px; line-height:1.6; white-space: pre-wrap;"></div>
+                <button onclick="tambahKeKeranjang()" style="background:var(--wa); color:white; padding:18px; border:none; border-radius:12px; width:100%; font-weight:bold; margin-top:20px;">🛒 TAMBAH KE PESANAN</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="fullscreen-view" ontouchstart="startFullTouch(event)" ontouchend="endFullTouch(event)">
+        <span class="close-full" onclick="tutupFull()">×</span>
+        <img id="full-img" ontouchstart="startZoom(event)" ontouchmove="doZoom(event)">
+    </div>
+
+    <div class="cart-btn" onclick="orderWA()">🛒 Pesanan (<span id="c-count">0</span>)</div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwaDj_pwTFU6Ls4kvvaJ_9J_qJ2TYvy6CRsZbsm3m-zlIaDTvE0e42fQucwTqEtCMtY/exec'; 
+        let db = [], cart = [], activeProd = null, photos = [], currentIdx = 0;
+        let touchX = 0, fullTouchX = 0, initialDist = -1;
+
+        const isAdmin = new URLSearchParams(window.location.search).get('mode') === 'admin';
+        if (isAdmin) document.getElementById('admin-box').style.display = 'block';
+
+        const fixUrl = (u) => (u && u.length > 20) ? `https://drive.google.com/thumbnail?id=${u.includes('id=') ? u.split('id=')[1].split('&')[0] : u.split('/d/')[1]?.split('/')[0]}&sz=w1000` : "";
+
+        async function muat() {
+            const r = await fetch(scriptURL);
+            db = await r.json();
+            filter('PROMO', document.querySelector('.tab'));
+        }
+
+        function filter(kat, el) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            const cont = document.getElementById('container');
+            cont.innerHTML = '';
+            let items = kat === 'PROMO' ? db.filter(i => i.hargaPromo > 0) : db.filter(i => i.kelompok === kat);
+            items.forEach(i => {
+                let harga = i.hargaPromo > 0 ? `<div class="price-container"><span class="price-old">Rp ${parseInt(i.hargaAsli).toLocaleString('id-ID')}</span><span class="price-new">Rp ${parseInt(i.hargaPromo).toLocaleString('id-ID')}</span></div>` : `<div class="price-container"><span class="price-new">Rp ${parseInt(i.hargaAsli).toLocaleString('id-ID')}</span></div>`;
+                cont.innerHTML += `<div class="card"><img src="${fixUrl(i.url)}" onclick="buka('${i.id}')"><div class="info"><b style="font-size:13px;">${i.nama}</b>${harga}${isAdmin ? `<button onclick="isiEdit('${i.id}')" style="background:var(--gold); color:white; border:none; padding:6px; margin-top:5px; border-radius:5px; width:100%;">EDIT</button>` : ''}</div></div>`;
+            });
+        }
+
+        function buka(id) {
+            activeProd = db.find(i => i.id == id);
+            photos = [activeProd.url, activeProd.url2, activeProd.url3, activeProd.url4, activeProd.url5].filter(u => u && u.length > 20);
+            currentIdx = 0;
+            updateSlider();
+            document.getElementById('v-nama').innerText = activeProd.nama;
+            document.getElementById('v-jenis').innerText = activeProd.jenis;
+            document.getElementById('v-desk').innerText = activeProd.deskripsi || "Detail produk Asheeqa Printing.";
+            document.getElementById('modal-detail').style.display = 'block';
+            history.pushState({modal:true}, '', '#detail');
+        }
+
+        function updateSlider() {
+            const img = document.getElementById('v-img');
+            const currentUrl = fixUrl(photos[currentIdx]);
+            img.src = currentUrl;
+            img.onclick = () => bukaFull(currentUrl); // Klik untuk Fullscreen
+
+            document.getElementById('v-dots').innerHTML = photos.map((_, i) => `<div class="dot ${i === currentIdx ? 'active' : ''}"></div>`).join('');
+            const thumbs = document.getElementById('v-thumbs');
+            thumbs.innerHTML = '';
+            photos.forEach((u, i) => {
+                let t = document.createElement('img'); t.src = fixUrl(u); t.className = 'thumb' + (i === currentIdx ? ' active-thumb' : '');
+                t.onclick = () => { currentIdx = i; updateSlider(); };
+                thumbs.appendChild(t);
+            });
+        }
+
+        // Swipe di Modal Detail
+        const slider = document.getElementById('slider-area');
+        slider.ontouchstart = e => touchX = e.touches[0].clientX;
+        slider.ontouchend = e => {
+            let diff = touchX - e.changedTouches[0].clientX;
+            if(Math.abs(diff) > 50) {
+                if(diff > 0 && currentIdx < photos.length-1) currentIdx++;
+                else if(diff < 0 && currentIdx > 0) currentIdx--;
+                updateSlider();
+            }
+        };
+
+        // FULLSCREEN LOGIC
+        function bukaFull(url) {
+            updateFullImage();
+            document.getElementById('fullscreen-view').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateFullImage() {
+            const fullImg = document.getElementById('full-img');
+            fullImg.style.opacity = '0';
+            setTimeout(() => {
+                fullImg.src = fixUrl(photos[currentIdx]);
+                fullImg.style.transform = "scale(1)";
+                fullImg.style.opacity = '1';
+            }, 150);
+        }
+
+        function startFullTouch(e) { if(e.touches.length === 1) fullTouchX = e.touches[0].clientX; }
+        function endFullTouch(e) {
+            if(e.changedTouches.length === 1) {
+                let diff = fullTouchX - e.changedTouches[0].clientX;
+                if(Math.abs(diff) > 70) {
+                    if(diff > 0 && currentIdx < photos.length-1) currentIdx++;
+                    else if(diff < 0 && currentIdx > 0) currentIdx--;
+                    updateSlider(); updateFullImage();
+                }
+            }
+        }
+
+        function startZoom(e) { if(e.touches.length === 2) initialDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); }
+        function doZoom(e) {
+            if(e.touches.length === 2 && initialDist > 0) {
+                let dist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+                let scale = Math.min(Math.max(dist / initialDist, 1), 3);
+                document.getElementById('full-img').style.transform = `scale(${scale})`;
+            }
+        }
+
+        function tutupFull() { document.getElementById('fullscreen-view').style.display = 'none'; document.body.style.overflow = 'auto'; }
+        function tutup() { if(window.location.hash === '#detail') history.back(); document.getElementById('modal-detail').style.display = 'none'; }
+        window.onpopstate = () => { tutup(); tutupFull(); };
+
+        function tambahKeKeranjang() { cart.push(activeProd.nama); document.getElementById('c-count').innerText = cart.length; alert("Ditambahkan!"); tutup(); }
+        function orderWA() { window.open(`https://api.whatsapp.com/send?phone=6289699910769&text=Halo Asheeqa Printing, saya mau pesan:%0A${cart.join('%0A')}`); }
+
+        function isiEdit(id) {
+            const i = db.find(x => x.id == id);
+            document.getElementById('edit-id').value = i.id;
+            document.getElementById('nama').value = i.nama;
+            document.getElementById('kelompok').value = i.kelompok;
+            document.getElementById('jenis').value = i.jenis;
+            document.getElementById('hargaA').value = i.hargaAsli;
+            document.getElementById('hargaP').value = i.hargaPromo;
+            document.getElementById('desk').value = i.deskripsi;
+            document.getElementById('o1').value = i.url || ""; document.getElementById('o2').value = i.url2 || "";
+            document.getElementById('o3').value = i.url3 || ""; document.getElementById('o4').value = i.url4 || "";
+            document.getElementById('o5').value = i.url5 || "";
+            document.getElementById('btnDel').style.display = 'block';
+            document.getElementById('btnSave').innerText = "UPDATE DATA";
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        async function simpan() {
+            const btn = document.getElementById('btnSave');
+            btn.disabled = true; btn.innerText = "⏳ Mengunggah...";
+            const toB64 = f => !f ? "" : new Promise((res) => {
+                const r = new FileReader(); r.readAsDataURL(f); r.onload = () => res(r.result);
+            });
+            const p = new URLSearchParams();
+            p.append('action', document.getElementById('edit-id').value ? 'update' : 'add');
+            p.append('rowId', document.getElementById('edit-id').value);
+            p.append('nama', document.getElementById('nama').value);
+            p.append('kelompok', document.getElementById('kelompok').value);
+            p.append('jenis', document.getElementById('jenis').value);
+            p.append('hargaAsli', document.getElementById('hargaA').value);
+            p.append('hargaPromo', document.getElementById('hargaP').value);
+            p.append('deskripsi', document.getElementById('desk').value);
+            for(let k=1; k<=5; k++) {
+                p.append('old'+k, document.getElementById('o'+k).value);
+                p.append('img'+k, await toB64(document.getElementById('f'+k).files[0]));
+            }
+            await fetch(scriptURL, { method: 'POST', body: p });
+            location.reload();
+        }
+
+        async function hapusProduk() {
+            if(!confirm("Hapus produk?")) return;
+            const p = new URLSearchParams();
+            p.append('action', 'delete'); p.append('rowId', document.getElementById('edit-id').value);
+            await fetch(scriptURL, { method: 'POST', body: p });
+            location.reload();
+        }
+        muat();
+    </script>
+</body>
+</html>
